@@ -1,4 +1,6 @@
 #!/bin/bash
+
 # Run with:
-# ./ansible --check -Kvvvv playbook.yml
+# ./ansible -K --ask-vault-pass pwyforg.yml
+
 /usr/bin/env ansible-playbook -i inventory "$@"
