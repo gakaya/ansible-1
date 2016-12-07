@@ -37,7 +37,7 @@
   register: "wp_salt"
 
 - name: Copy WordPress config file
-  template: src=wp-config.php.j2 dest=/var/www/{{ site_path }}/wp-config.php
+  template: src=wp-config.php.j2 dest=/var/www/{{ site_path }}/wp-config.php owner={{ user }} group=www-data
   become: true
 
 - name: Create apache site config
