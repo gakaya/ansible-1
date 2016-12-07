@@ -1,0 +1,4 @@
+#!/bin/bash
+# Run with:
+# ./ansible --check -Kvvvv playbook.yml
+/usr/bin/env ansible-playbook -i inventory "$@"

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  remote_user: admin
+  become_user: root
+  become_method: su
+
+  vars_files:
+   - vars/pwyforg.yml
+
+  roles:
+   - lamp_wp
