@@ -4,6 +4,9 @@
   become_user: root
   become_method: su
 
+  vars:
+    site_url: publishwhatyoufund.org
+
   vars_files:
    - vars/pwyforg.yml
 
