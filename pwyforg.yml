@@ -8,7 +8,10 @@
     site_url: publishwhatyoufund.org
 
   vars_files:
-   - vars/pwyforg.yml
+   - playbook_vars/pwyforg.yml
 
   roles:
-   - lamp_wp
+   - initial
+   - apache2
+   - php_mysql
+   - wordpress

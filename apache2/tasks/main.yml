@@ -1,0 +1,18 @@
+---
+- name: Install apache2
+  apt: name={{ item }} state=present
+  with_items:
+    - apache2
+  become: true
+
+- name: Disable default apache site
+  command: a2dissite 000-default.conf
+  notify:
+   - restart apache
+  become: true
+
+- name: Prevent directory listing
+  copy: src=dir.conf dest=/etc/apache2/mods-enabled/dir.conf
+  notify:
+    - restart apache
+  become: true

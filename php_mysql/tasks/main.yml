@@ -1,0 +1,63 @@
+---
+- name: Install required software
+  apt: name={{ item }} state=present
+  with_items:
+    - mysql-server
+    - php5-mysql
+    - php5
+    - libapache2-mod-php5
+    - php5-mcrypt
+    - python-mysqldb
+  become: true
+
+- name: Install php extensions
+  apt: name={{ item }} state=present
+  with_items:
+    - php5-gd
+    - libssh2-php
+  become: true
+
+- name: Run mysql_install_db
+  command: mysql_install_db
+  become: true
+
+- name: Sets the root password
+  mysql_user: user=root password="{{ mysql_root_pwd }}" host=localhost
+  become: true
+
+- name: Create .my.cnf
+  template:
+    src: ".my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  become: true
+
+- name: Deletes anonymous MySQL server user for ansible_fqdn
+  mysql_user: user="" host="{{ ansible_fqdn }}" state="absent"
+  become: true
+
+- name: Deletes anonymous MySQL server user for localhost
+  mysql_user: user="" state="absent"
+  become: true
+
+- name: Secures the MySQL root user for IPV6 localhost (::1)
+  mysql_user: user="root" password="{{ mysql_root_pwd }}" host="::1"
+  become: true
+
+- name: Secures the MySQL root user for IPV4 localhost (127.0.0.1)
+  mysql_user: user="root" password="{{ mysql_root_pwd }}" host="127.0.0.1"
+  become: true
+
+- name: Secures the MySQL root user for localhost domain (localhost)
+  mysql_user: user="root" password="{{ mysql_root_pwd }}" host="localhost"
+  become: true
+
+- name: Secures the MySQL root user for server_hostname domain
+  mysql_user: user="root" password="{{ mysql_root_pwd }}" host="{{ ansible_fqdn }}"
+  become: true
+
+- name: Removes the MySQL test database
+  mysql_db: db=test state=absent
+  become: true
