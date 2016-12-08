@@ -1,5 +1,5 @@
 import logging, sys
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/home/tracker/{{ item.repo }}/pyenv/lib/python2.7/site-packages')
-sys.path.insert(0, '/home/tracker/{{ item.repo }}')
+sys.path.insert(0, '/var/www/{{ user }}/{{ item.repo }}/pyenv/lib/python2.7/site-packages')
+sys.path.insert(0, '/var/www/{{ user }}/{{ item.repo }}')
 from {{ item.app_name }} import app as application
