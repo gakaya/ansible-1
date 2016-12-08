@@ -1,0 +1,68 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName {{ site_url }}
+    DocumentRoot /var/www/{{ user }}/htdocs
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    LogLevel warn
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    RewriteEngine On
+    RewriteRule ^/organisations(.*)$ http://{{ site_url }}/plan/organisations$1
+    RewriteRule ^/fields(.*)$ http://{{ site_url }}/plan/fields$1
+    RewriteRule ^/timeline(.*)$ http://{{ site_url }}/plan/timeline$1
+    RewriteRule ^/about(.*)$ http://{{ site_url }}/plan/about$1
+    RewriteRule ^/api(.*)$ http://{{ site_url }}/plan/api$1
+    RewriteRule ^/api(.*)$ http://{{ site_url }}/plan/api$1
+    RewriteRule ^/static(.*)$ http://{{ site_url }}/plan/static$1
+
+    Alias /publish/static /var/www/{{ user }}/IATI-Data-Quality/iatidataquality/static
+
+    {%- for app in flask_apps %}
+
+    WSGIDaemonProcess {{ app.process }} user={{ user }} group={{ user }} threads=5
+    WSGIScriptAlias /publish /var/www/{{ user }}/conf/{{ app.conf_directory }}/{{ app.process }}.wsgi
+
+    {%- endfor %}
+
+    <Directory /var/www/{{ user }}/htdocs>
+        Options FollowSymLinks MultiViews
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    {%- for app in flask_apps %}
+
+    <Directory /var/www/{{ user }}/{{ app.repo }}/{{ app.app_name }}/static>
+        Options FollowSymLinks MultiViews
+        Require all granted
+    </Directory>
+
+    {%- endfor %}
+
+    <Directory /var/www/{{ user }}/conf>
+        Options FollowSymLinks MultiViews
+        Order deny,allow
+        Allow from all
+        Require all granted
+    </Directory>
+
+    {%- for app in flask_apps %}
+
+    <Directory /var/www/{{ user }}/conf/{{ app.conf_directory }}>
+        Options FollowSymLinks MultiViews
+        WSGIProcessGroup {{ app.process }}
+        WSGIApplicationGroup %{GLOBAL}
+        Order deny,allow
+        Allow from all
+        Require all granted
+        <Files {{ app.process }}.wsgi>
+            Order deny,allow
+            Allow from all
+            Require all granted
+        </Files>
+    </Directory>
+
+    {%- endfor %}
+
+</VirtualHost>

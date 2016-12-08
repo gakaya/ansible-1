@@ -1,0 +1,13 @@
+---
+- name: Install required software
+  apt: name={{ item }} state=present
+  with_items:
+    - libapache2-mod-wsgi
+    - python-dev
+  become: true
+
+- name: Enable apache modules
+  command: a2enmod wsgi rewrite
+  notify:
+   - restart apache
+  become: true

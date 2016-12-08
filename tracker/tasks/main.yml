@@ -1,0 +1,29 @@
+---
+- name: Clone att-website config code repo
+  git: repo=https://github.com/pwyf/att-website.git dest=/var/www/tracker/htdocs version=HEAD
+  become: true
+
+- name: Clone flask apps
+  git: repo=https://github.com/pwyf/{{ item.repo }}.git dest=/var/www/tracker/{{ item.repo }} version=HEAD
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create conf directories
+  file: path=/var/www/tracker/conf/{{ item.conf_directory }} state=directory
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create wsgi files
+  template: src=app.wsgi.j2 dest=/var/www/tracker/conf/{{ item.conf_directory }}/{{ item.process }}.wsgi
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create apache site config
+  template: src=apache.conf.j2 dest=/etc/apache2/sites-available/{{ site_url }}.conf
+  become: true
+
+- name: Enable {{ site_url }} apache site
+  command: a2ensite {{ site_url }}.conf
+  notify:
+   - restart apache
+  become: true

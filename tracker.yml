@@ -1,0 +1,14 @@
+---
+- hosts: all
+  remote_user: admin
+  become_user: root
+  become_method: su
+
+  vars:
+    site_url: tracker.publishwhatyoufund.org
+    user: tracker
+
+  roles:
+   - common
+   - apache_wsgi
+   - tracker

@@ -1,0 +1,16 @@
+---
+flask_apps:
+  - app_name: iatidataquality
+    process: dq
+    conf_directory: publish
+    repo: IATI-Data-Quality
+
+  - app_name: impschedules
+    process: impsched
+    conf_directory: plan
+    repo: IATI-Implementation-Schedules
+
+  - app_name: iatiupdates
+    process: iatiupdates
+    conf_directory: iatiupdates
+    repo: IATI-Updates
