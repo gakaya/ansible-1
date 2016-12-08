@@ -16,8 +16,6 @@
     RewriteRule ^/api(.*)$ http://{{ site_url }}/plan/api$1
     RewriteRule ^/static(.*)$ http://{{ site_url }}/plan/static$1
 
-    Alias /publish/static /var/www/{{ user }}/IATI-Data-Quality/iatidataquality/static
-
     {%- for app in flask_apps %}
 
     WSGIDaemonProcess {{ app.process }} user={{ user }} group={{ user }} threads=5
@@ -33,6 +31,7 @@
 
     {%- for app in flask_apps %}
 
+    Alias /{{ app.conf_directory }}/static /var/www/{{ user }}/{{ app.repo }}/{{ app.app_name }}/static
     <Directory /var/www/{{ user }}/{{ app.repo }}/{{ app.app_name }}/static>
         Options FollowSymLinks MultiViews
         Require all granted
