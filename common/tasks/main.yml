@@ -1,0 +1,35 @@
+---
+- name: Switch locale
+  command: locale-gen en_GB.UTF-8 dpkg-reconfigure locales
+
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+  become: true
+
+- name: Install git
+  apt: name=git state=present
+  become: true
+
+- name: Add group
+  group: name={{ user }}
+  become: true
+
+- name: Add user
+  user: name={{ user }} group={{ user }}
+  become: true
+
+- name: Install apache2
+  apt: name=apache2 state=present
+  become: true
+
+- name: Disable default apache site
+  command: a2dissite 000-default.conf
+  notify:
+   - restart apache
+  become: true
+
+- name: Prevent directory listing
+  copy: src=dir.conf dest=/etc/apache2/mods-enabled/dir.conf
+  notify:
+    - restart apache
+  become: true

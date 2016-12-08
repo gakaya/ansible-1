@@ -11,7 +11,6 @@
    - playbook_vars/pwyforg.yml
 
   roles:
-   - initial
-   - apache2
+   - common
    - php_mysql
    - wordpress
