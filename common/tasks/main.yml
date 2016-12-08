@@ -1,6 +1,11 @@
 ---
 - name: Switch locale
-  command: locale-gen en_GB.UTF-8 dpkg-reconfigure locales
+  command: locale-gen en_GB.UTF-8
+  become: true
+
+- name: Switch locale
+  command: dpkg-reconfigure locales
+  become: true
 
 - name: Update apt cache
   apt: update_cache=yes cache_valid_time=3600
