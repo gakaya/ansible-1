@@ -1,25 +1,79 @@
 ---
+- name: Install required software
+  apt: name={{ item }} state=present
+  with_items:
+   - postgresql
+   - postgresql-contrib
+   - libpq-dev
+   - python-pip
+   - libxml2-dev
+   - libxslt1-dev
+   - sqlite
+   - rabbitmq-server
+   - screen
+  become: true
+
+- name: Install virtualenv
+  pip: name=virtualenv
+  become: true
+
 - name: Clone att-website config code repo
-  git: repo=https://github.com/pwyf/att-website.git dest=/var/www/tracker/htdocs version=HEAD
+  git:
+    repo: https://github.com/pwyf/att-website.git
+    dest: /var/www/{{ user }}/htdocs
+    version: HEAD
   become: true
 
 - name: Clone flask apps
-  git: repo=https://github.com/pwyf/{{ item.repo }}.git dest=/var/www/tracker/{{ item.repo }} version=HEAD
+  git:
+    repo: https://github.com/pwyf/{{ item.repo }}.git
+    dest: /var/www/{{ user }}/{{ item.repo }}
+    version: HEAD
   with_items: "{{ flask_apps }}"
   become: true
 
-- name: Create conf directories
-  file: path=/var/www/tracker/conf/{{ item.conf_directory }} state=directory
+- name: Pip install dependencies for flask apps
+  pip:
+    virtualenv: /var/www/{{ user }}/{{ item.repo }}/pyenv
+    requirements: /var/www/{{ user }}/{{ item.repo }}/requirements.txt
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create flask app configs
+  template:
+    src: "{{ item.app_name }}.config.py.j2"
+    dest: /var/www/{{ user }}/{{ item.repo }}/config.py
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create sample work config
+  template:
+    src: "sample_work.config.py.j2"
+    dest: /var/www/{{ user }}/IATI-Data-Quality/sample_work/config.py
+  with_items: "{{ flask_apps }}"
+  become: true
+
+- name: Create data directories
+  file: path=/var/www/{{ user }}/{{ item }} state=directory
+  with_items: "{{ data_directories }}"
+  become: true
+
+- name: Create wsgi conf directories
+  file: path=/var/www/{{ user }}/conf/{{ item.conf_directory }} state=directory
   with_items: "{{ flask_apps }}"
   become: true
 
 - name: Create wsgi files
-  template: src=app.wsgi.j2 dest=/var/www/tracker/conf/{{ item.conf_directory }}/{{ item.process }}.wsgi
+  template:
+    src: app.wsgi.j2
+    dest: /var/www/{{ user }}/conf/{{ item.conf_directory }}/{{ item.process }}.wsgi
   with_items: "{{ flask_apps }}"
   become: true
 
 - name: Create apache site config
-  template: src=apache.conf.j2 dest=/etc/apache2/sites-available/{{ site_url }}.conf
+  template:
+    src: apache.conf.j2
+    dest: /etc/apache2/sites-available/{{ site_url }}.conf
   become: true
 
 - name: Enable {{ site_url }} apache site

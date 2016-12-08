@@ -4,6 +4,9 @@
   become_user: root
   become_method: su
 
+  vars_files:
+   - playbook_vars/2016tracker.yml
+
   vars:
     site_url: tracker.publishwhatyoufund.org
     user: tracker

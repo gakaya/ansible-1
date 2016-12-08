@@ -14,3 +14,9 @@ flask_apps:
     process: iatiupdates
     conf_directory: iatiupdates
     repo: IATI-Updates
+
+data_directories:
+  - dq/data
+  - dq/sample_work
+  - impsched/data/temp
+  - impsched/data/xml
