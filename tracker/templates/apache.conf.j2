@@ -19,7 +19,7 @@
     {%- for app in flask_apps %}
 
     WSGIDaemonProcess {{ app.process }} user={{ user }} group={{ user }} threads=5
-    WSGIScriptAlias /publish /var/www/{{ user }}/conf/{{ app.conf_directory }}/{{ app.process }}.wsgi
+    WSGIScriptAlias /{{ app.conf_directory }} /var/www/{{ user }}/conf/{{ app.conf_directory }}/{{ app.process }}.wsgi
 
     {%- endfor %}
 
