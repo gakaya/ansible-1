@@ -41,7 +41,7 @@
   become: true
 
 - name: Create apache site config
-  template: src=apache-site.conf.j2 dest=/etc/apache2/sites-available/{{ site_url }}.conf
+  template: src=apache.conf.j2 dest=/etc/apache2/sites-available/{{ site_url }}.conf
   become: true
 
 - name: Enable {{ site_url }} apache site
