@@ -32,6 +32,14 @@
   with_items: "{{ flask_apps }}"
   become: true
 
+- name: Pip install latest setuptools and pip
+  pip:
+    virtualenv: /var/www/{{ user }}/{{ item.repo }}/pyenv
+    name: setuptools pip
+    state: latest
+  with_items: "{{ flask_apps }}"
+  become: true
+
 - name: Pip install dependencies for flask apps
   pip:
     virtualenv: /var/www/{{ user }}/{{ item.repo }}/pyenv
