@@ -18,8 +18,8 @@
 
     {%- for app in flask_apps %}
 
-    WSGIDaemonProcess {{ app.process }} user={{ user }} group={{ user }} threads=5
-    WSGIScriptAlias /{{ app.conf_directory }} /var/www/{{ user }}/conf/{{ app.conf_directory }}/{{ app.process }}.wsgi
+    WSGIDaemonProcess {{ app.process }}{{ year }} user={{ user }} group={{ user }} threads=5
+    WSGIScriptAlias /{{ app.conf_directory }} /var/www/{{ user }}/conf/{{ app.conf_directory }}/{{ app.process }}{{ year }}.wsgi
 
     {%- endfor %}
 
@@ -50,12 +50,12 @@
 
     <Directory /var/www/{{ user }}/conf/{{ app.conf_directory }}>
         Options FollowSymLinks MultiViews
-        WSGIProcessGroup {{ app.process }}
+        WSGIProcessGroup {{ app.process }}{{ year }}
         WSGIApplicationGroup %{GLOBAL}
         Order deny,allow
         Allow from all
         Require all granted
-        <Files {{ app.process }}.wsgi>
+        <Files {{ app.process }}{{ year }}.wsgi>
             Order deny,allow
             Allow from all
             Require all granted

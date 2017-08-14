@@ -74,7 +74,7 @@
 - name: Create wsgi files
   template:
     src: app.wsgi.j2
-    dest: /var/www/{{ user }}/conf/{{ item.conf_directory }}/{{ item.process }}.wsgi
+    dest: /var/www/{{ user }}/conf/{{ item.conf_directory }}/{{ item.process }}{{ year }}.wsgi
   with_items: "{{ flask_apps }}"
   become: true
 
