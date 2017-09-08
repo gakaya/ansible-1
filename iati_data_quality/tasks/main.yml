@@ -1,0 +1,99 @@
+---
+- name: Install required software
+  apt: name={{ item }} state=present
+  with_items:
+   - postgresql
+   - postgresql-contrib
+   - libpq-dev
+   - python-pip
+   - python-psycopg2
+   - libxml2-dev
+   - libxslt1-dev
+   - sqlite
+   - rabbitmq-server
+   - screen
+  become: true
+
+- name: Create postgres database
+  postgresql_db:
+    name: tracker{{ year }}
+    encoding: UTF-8
+  become: true
+  become_method: sudo
+  become_user: postgres
+
+- name: Create postgres role
+  postgresql_user:
+    db: tracker{{ year }}
+    name: tracker{{ year }}
+    priv: ALL
+    state: present
+  become: true
+  become_method: sudo
+  become_user: postgres
+
+- name: Install virtualenv
+  pip: name=virtualenv
+  become: true
+
+- name: Clone flask app
+  git:
+    repo: https://github.com/pwyf/IATI-Data-Quality.git
+    dest: /var/www/{{ user }}/IATI-Data-Quality
+    version: HEAD
+  become: true
+
+- name: Pip install latest setuptools and pip
+  pip:
+    virtualenv: /var/www/{{ user }}/IATI-Data-Quality/pyenv
+    name: setuptools pip
+    state: latest
+  become: true
+
+- name: Pip install dependencies for flask app
+  pip:
+    virtualenv: /var/www/{{ user }}/IATI-Data-Quality/pyenv
+    requirements: /var/www/{{ user }}/IATI-Data-Quality/requirements.txt
+  become: true
+
+- name: Create flask app config
+  template:
+    src: "config.py.j2"
+    dest: /var/www/{{ user }}/IATI-Data-Quality/config.py
+  become: true
+
+- name: Create sample work config
+  template:
+    src: "sample_work.config.py.j2"
+    dest: /var/www/{{ user }}/IATI-Data-Quality/sample_work/config.py
+  become: true
+
+- name: Create data directory
+  file: path=/var/www/{{ user }}/dq/data state=directory
+  become: true
+
+- name: Create sample work directory
+  file: path=/var/www/{{ user }}/dq/sample_work state=directory
+  become: true
+
+- name: Create wsgi conf directories
+  file: path=/var/www/{{ user }}/conf/publish state=directory
+  become: true
+
+- name: Create wsgi files
+  template:
+    src: app.wsgi.j2
+    dest: /var/www/{{ user }}/conf/publish/dq{{ year }}.wsgi
+  become: true
+
+- name: Create apache site config
+  template:
+    src: apache.conf.j2
+    dest: /etc/apache2/sites-available/{{ site_url }}.conf
+  become: true
+
+- name: Enable {{ site_url }} apache site
+  command: a2ensite {{ site_url }}.conf
+  notify:
+   - restart apache
+  become: true

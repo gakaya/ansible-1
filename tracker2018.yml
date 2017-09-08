@@ -1,0 +1,18 @@
+---
+- hosts: all
+  remote_user: admin
+  become_user: root
+  become_method: su
+
+  vars_files:
+   - playbook_vars/2018tracker.yml
+
+  vars:
+    site_url: 2018tracker.dev.publishwhatyoufund.org
+    user: tracker2018
+    year: 2018
+
+  roles:
+   - common
+   - apache_wsgi
+   - iati_data_quality
